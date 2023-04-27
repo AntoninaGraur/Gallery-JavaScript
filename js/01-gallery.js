@@ -1,12 +1,13 @@
-import { galleryItems } from './gallery-items.js';
+import { galleryItems } from "./gallery-items.js";
 // Change code below this line
 
 console.log(galleryItems);
 
-const galleryList = document.querySelector('.gallery');
+const galleryList = document.querySelector(".gallery");
 
-const galleryItemsMarkup = galleryItems.map(({ preview, original, description }) => {
-  return `
+const galleryItemsMarkup = galleryItems
+  .map(({ preview, original, description }) => {
+    return `
     <li class="gallery__item">
       <a class="gallery__link" href="${original}">
         <img
@@ -18,23 +19,37 @@ const galleryItemsMarkup = galleryItems.map(({ preview, original, description })
       </a>
     </li>
   `;
-}).join('');
+  })
+  .join("");
 
-galleryList.insertAdjacentHTML('beforeend', galleryItemsMarkup);
+galleryList.insertAdjacentHTML("beforeend", galleryItemsMarkup);
 
+let modal;
 
+function onModalEscapeClose(event) {
+  console.log(event.code)
+  if (event.code !== "Escape") return;
+  modal.close();
+}
 
-const galleryImages = document.querySelectorAll('.gallery__image');
+galleryList.addEventListener("click", (event) => {
+  if (event.target.nodeName !== "IMG") return;
+  const largeImageSrc = event.target.dataset.source;
+  event.preventDefault();
+  const options = {
+    onShow: (instance) => {
+      document.addEventListener("keydown", onModalEscapeClose);
+    },
+    onClose: (instance) => {
+      document.removeEventListener("keydown", onModalEscapeClose);
+    },
+  };
 
-galleryImages.forEach((image) => {
-    image.addEventListener('click', (event) => {
-      
-      const largeImageSrc = image.dataset.source;
-      event.preventDefault()
-    const modal = basicLightbox.create(`
+  modal = basicLightbox.create(
+    `
       <img src="${largeImageSrc}" alt="" />
-    `);
-    modal.show();
-  });
+    `,
+    options
+  );
+  modal.show();
 });
-
